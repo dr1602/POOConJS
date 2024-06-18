@@ -1,10 +1,10 @@
 // objeto literal
 const Riley  = {
     // propiedades
-    nombre: 'Riley ',
+    _nombre: 'Riley ',
     segundoNombre: 'Elphaba ',
     apellido: 'Andersen',
-    edad: 13,
+    _edad: 13,
     cursosAprobados: [
         'Curso Definitivo de HTML y CSS',
         'Curso Práctico de HTML y CSS'
@@ -17,15 +17,31 @@ const Riley  = {
         this.cursosAprobados.push(nuevoCurso)
     },
 
+    get nombre() {
+        return this._nombre;
+    },
+
+    get edad() {
+        return this._edad;
+    },
+
+    set nombre(nuevoNombre) {
+        this._nombre = nuevoNombre;
+    },
+
+    set edad(nuevaEdad) {
+        this._edad = nuevaEdad;
+    }
+
 }; 
 
 // Hacer que Riley aprueba otro curso
 
 // Riley.cursosAprobados.push('Curso de Responsive Design');
 
-function Student (name, age, emocion, cursosAprobados, adress, ) {
-    this.name = name;
-    this.age = age;
+function Student (name, age, emocion, cursosAprobados, adress ) {
+    this._name = name;
+    this._age = age;
     this.emocion = emocion
     this.cursosAprobados = cursosAprobados;
     this.adress = adress
@@ -33,6 +49,26 @@ function Student (name, age, emocion, cursosAprobados, adress, ) {
         this.cursosAprobados.push(nuevoCurso);
     }
 }
+
+// Se definen los getters y setters fuera del constructor cuando no es una Clase y con la propiedad Object.defineProperty
+
+Object.defineProperty(Student.prototype, 'name', {
+    get name() {
+        return this._name;
+    },
+    set name (nuevoNombre) {
+        this._name = nuevoNombre;
+    },
+})
+
+Object.defineProperty(Student.prototype, 'age', {
+    get age() {
+        return this._age;
+    },
+    set age(nuevaEdad) {
+        this._age = nuevaEdad;
+    }
+})
 
 // creamos un metodo para nuestro metodo student por fuera de la funcion o prototipo, usando la herramienta prototupe, para crear los que queramos
 Student.prototype.agregarEmocion = function(nuevaEmocion) {
@@ -54,6 +90,7 @@ const Vale = new Student(
         'Curso de creacion de personajes'
     ],
     'San Francisco'
+    
 )
 
 // Prototipos con la sintaxis de Clases
@@ -181,14 +218,42 @@ class AdvancedEmotion {
         friends = {},
         learningPaths = {},
     }) {
-        this.name = name;
+        this._name = name;
         this.human = human;
         this.jobLocaton = jobLocaton;
         this.energyType = energyType;
-        this.age = age;
+        this._age = age;
         this.responsabilities = responsabilities;
         this.friends = friends;
         this.learningPaths = learningPaths;
+    }
+
+    get name() {
+        return this._name;
+    }
+
+    set name(nuevoNombre) {
+
+        if (typeof nuevoNombre !== 'string') {
+            console.error('El nombre de la o el personaje tiene que ser una cadena de texto')
+        } else {
+            this._name = nuevoNombre;
+        }
+        
+    }
+
+    get age() {
+        return this._name;
+    }
+
+    set age(nuevaEdad) {
+
+        if (typeof nuevaEdad !== 'number') {
+            console.error('La edad de la o el personaje tiene que ser un numero')
+        } else {
+            this._age = nuevaEdad;
+        }
+        
     }
 }
 
@@ -201,8 +266,22 @@ class learningPath {
         subpaths = {},
     }) {
         this.name = name;
-        this.name = escuela;
+        this._escuela = escuela;
         this.subpaths = subpaths;
+    }
+
+    get escuela() {
+        return this._escuela;
+    }
+
+    set escuela(nuevaEscuela) {
+
+        if (typeof nuevaEscuela !== 'string') {
+            console.error('Las escuelas tienen que ser cadenas de texto')
+        } else {
+            this._escuela = nuevaEscuela;
+        }
+        
     }
 }
 
@@ -216,36 +295,105 @@ class moduleCreator {
 
 class coursesCreator {
     constructor({
-        courses = {}, 
+        name = '',
+        classes = {}, 
     }) {
-        this.courses = courses;
+        // por convencion con el guion bajo se pide que no se llame al atributo desde afuera
+        this._name = name;
+        this.classes = classes;
+    }
+
+    // para conseguir el nombre del curso, se parecera a un metodo 
+    get name() {
+        // para dar el nombre metodo privado entre comillas definido en el constructor
+        return this._name;
+    }
+
+    // Nuevo metodo con se para cambiar el nombre
+    set name(nuevoNombre) {
+        // recuerdas el objetivo del encapsulamiento?
+
+        if (nuevoNombre === '') {
+            console.error('Los nombres no pueden estar vacios')
+        } else {
+            this._name = nuevoNombre;
+        }
+        
+    }
+
+}
+
+// Modulos de ECMAScript 6
+// con la extension main.mjs, empezamos a realmente trabajar con modulos de JS
+
+function videoPlay (id) {
+    const urlScreta = 'https://videosDeAprendizajeIntensamente/' + id;
+    console.log(`Se reproduce desde: ${urlScreta}`)
+}
+
+function videoStop (id) {
+    const urlScreta = 'https://videosDeAprendizajeIntensamente/' + id;
+    console.log(`Pausamos el video en la url: ${urlScreta}`)
+}
+
+export class PlatziClass {
+    constructor({
+        name,
+        videoID,
+    }) {
+        this.name = name;
+        this.videoID = videoID;
+    }
+
+    reproducir() {
+        videoPlay(this.videoID);
+    }
+
+    pausar() {
+        videoStop(this.videoID);
     }
 }
 
 const FrontDeveloper = new coursesCreator ({
-    courses : {
-        'Curso de Frontend Developer' : [
-            'Inicia tu camino como Frontend Developer',
-            '¿Qué es HTML y CSS? ¿Para qué sirven?',
-            'Motores de render: de archivos a píxeles',
-        ],
-        'Curso Practico de Frontend Developer' : [
-            '¿Ya tomaste el Curso de Frontend Developer?',
-            'Buenas prácticas de CSS: reflexión y advertencias',
-            'Identifica las pantallas de tu proyecto',
-        ],
-        'Curso Practico de JS' : [
-            '¿Ya tomaste el Curso Básico de JavaScript?',
-            'Test de JS',
-            'Variables',
-        ]
-    }
+    name: 'Curso de Frontend Developer',
+    classes : [
+        'Inicia tu camino como Frontend Developer',
+        '¿Qué es HTML y CSS? ¿Para qué sirven?',
+        'Motores de render: de archivos a píxeles',
+    ],
+})
+
+FrontDeveloper.name
+// 'Curso de Frontend Developer'
+
+// FrontDeveloper.name = ''
+// ''
+
+
+const PracticoFrontDeveloper = new coursesCreator ({
+    name: 'Curso Practico de Frontend Developer',
+    classes : [
+        '¿Ya tomaste el Curso de Frontend Developer?',
+        'Buenas prácticas de CSS: reflexión y advertencias',
+        'Identifica las pantallas de tu proyecto',
+    ],
+})
+
+const PracticoJS = new coursesCreator ({
+    name: 'Curso Practico de JS',
+    classes : [
+        '¿Ya tomaste el Curso Básico de JavaScript?',
+        'Test de JS',
+        'Variables',
+    ]
 })
 
 const FundamentosDesarrollo = new moduleCreator ({
     module : {
         'Fundamentos de desarrollo web' : [
-            FrontDeveloper
+            FrontDeveloper,
+            PracticoFrontDeveloper,
+            PracticoJS,
         ]
     }
 })
