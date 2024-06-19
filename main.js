@@ -39,16 +39,68 @@ const Riley  = {
 
 // Riley.cursosAprobados.push('Curso de Responsive Design');
 
-function Student (name, age, emocion, cursosAprobados, adress ) {
+function Student (name, age, emocion, cursosAprobados, address ) {
     this._name = name;
     this._age = age;
     this.emocion = emocion
     this.cursosAprobados = cursosAprobados;
-    this.adress = adress
+    this.address = address
     this.aprobarCurso = function(nuevoCurso) {
         this.cursosAprobados.push(nuevoCurso);
     }
 }
+
+// Extension sin clases
+
+Student.prototype.aprobarCurso = function(nuevoCurso) {
+    this.cursosAprobados.push(nuevoCurso)
+}
+
+// Constructor de FreeStudent
+
+function FreeStudent(name, age, emocion, cursosAprobados, address) {
+    Student.call(this, name, age, emocion, cursosAprobados, address);
+    this.tipo = 'Free';
+}
+
+// Herencia prototipica para FreeStudent;
+
+FreeStudent.prototype = Object.create(Student.prototype);
+FreeStudent.prototype.constructor = FreeStudent;
+
+// Constructor de BasicStudent
+
+function BasicStudent(name, age, emocion, cursosAprobados, address) {
+    Student.call(this, name, age, emocion, cursosAprobados, address);
+    this.tipo = 'Basic';
+}
+
+// Herencia prototipica para BasicStudent
+
+BasicStudent.prototype = Object.create(Student.prototype);
+BasicStudent.prototype.constructor = BasicStudent;
+
+// Constructor de ExpertStudent
+
+function ExpertStudent(name, age, emocion, cursosAprobados, address) {
+    Student.call(this, name, age, emocion, cursosAprobados, address);
+    this.tipo = 'Expert';
+}
+
+// Herencia prototipica para ExpertStudent
+
+ExpertStudent.prototype = Object.create(Student.prototype);
+ExpertStudent.prototype.constructor = ExpertStudent;
+
+// Ejemplo de uso
+
+const freeStudent = new FreeStudent('Alice', 20, 'Happy', ['Math'], '123 Main St.');
+const basicStudent = new BasicStudent('Bob', 22, 'Excited', ['Science'], '456 Elm St.');
+const expertStudent = new ExpertStudent('Charles', 24, 'Determined', ['Physics'], '789 Oak St.');
+
+console.log(freeStudent);
+console.log(basicStudent);
+console.log(expertStudent);
 
 // Se definen los getters y setters fuera del constructor cuando no es una Clase y con la propiedad Object.defineProperty
 
@@ -101,13 +153,13 @@ class IntensamenteCharacter {
         name, 
         age, 
         emotions,
-        adress,
+        address,
         team = '',
     }) {
         this.name = name;
         this.age = age;
         this.emotions = emotions;
-        this.adress = adress;
+        this.address = address;
         this.friends = friends;
         this.team = team;
     }
@@ -120,7 +172,7 @@ class IntensamenteCharacter {
 const Bree = new IntensamenteCharacter({    
     age: 12,
     name: 'Breonna "Bree" Young',
-    adress: 'San Francisco',
+    address: 'San Francisco',
     emotions: [
         'Alegria',
         'Tristeza',
@@ -205,6 +257,30 @@ const Furia = {
 
 // Tendriamos que modificar estudiante por estudiante, es rapido comenzar pero no es escalable.
 
+// Polimorfismo
+
+class Comment {
+    constructor({
+        content,
+        studentName,
+        studentRole = 'estudiante',
+    }) {
+        this.content = content;
+        this.studentName = studentName;
+        this.studentRole = studentRole;
+        // sin necesidad de recibir atributos, podemos crear mas atributos
+        this.likes = 0;
+        // despues crearimos un atributo para agregar mas comentarios
+    }
+
+    publicar() {
+        console.log(`${this.studentName} (${this.studentRole})`);
+        console.log(`${this.likes} likes`)
+        console.log(`${this.content}`)
+    }
+}
+
+
 // PROGRAMACION ORIENTADA A OBJETOS CON CLASES PARA CREAR INSTANCIAS
 
 class AdvancedEmotion {
@@ -216,6 +292,7 @@ class AdvancedEmotion {
         age = undefined,
         responsabilities = {},
         friends = {},
+        approvedCourses=[],
         learningPaths = {},
     }) {
         this._name = name;
@@ -225,6 +302,7 @@ class AdvancedEmotion {
         this._age = age;
         this.responsabilities = responsabilities;
         this.friends = friends;
+        this.approvedCourses = approvedCourses;
         this.learningPaths = learningPaths;
     }
 
@@ -254,6 +332,74 @@ class AdvancedEmotion {
             this._age = nuevaEdad;
         }
         
+    }
+
+    publicarComentario(commentContent) {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+        })
+
+        comment.publicar();
+    }
+}
+
+class AdvancedEmotionWithPlatziFreeStudent extends AdvancedEmotion {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        if (newCourse.isFree) {
+            this.approvedCourses.push(newCourse)
+        } else {
+            console.warn(`Lo siento, ${this.name}, solo puede tomar cursos abiertos`)
+        }
+    }
+
+}
+
+class AdvancedEmotionWithPlatziBasicStudent extends AdvancedEmotion {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        if (newCourse.lang !== 'english') {
+            this.approvedCourses.push(newCourse)
+        } else {
+            console.warn(`Lo siento, ${this.name}, no puedes tomar cursos en inglés`)
+        }
+    }
+}
+
+class AdvancedEmotionWithPlatziExpertStudent extends AdvancedEmotion {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        this.approvedCourses.push(newCourse)
+    }
+}
+
+class AdvancedEmotionAsTeacher extends AdvancedEmotion {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        this.approvedCourses.push(newCourse)
+    }
+
+    publicarComentario(commentContent) {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+            studentRole: 'profesor'
+        })
+
+        comment.publicar();
     }
 }
 
@@ -297,10 +443,14 @@ class coursesCreator {
     constructor({
         name = '',
         classes = {}, 
+        isFree = false,
+        lang = 'spanish',
     }) {
         // por convencion con el guion bajo se pide que no se llame al atributo desde afuera
         this._name = name;
         this.classes = classes;
+        this.isFree = isFree;
+        this.lang = lang;
     }
 
     // para conseguir el nombre del curso, se parecera a un metodo 
@@ -336,7 +486,7 @@ function videoStop (id) {
     console.log(`Pausamos el video en la url: ${urlScreta}`)
 }
 
-export class PlatziClass {
+class PlatziClass {
     constructor({
         name,
         videoID,
@@ -356,6 +506,7 @@ export class PlatziClass {
 
 const FrontDeveloper = new coursesCreator ({
     name: 'Curso de Frontend Developer',
+    isFree: true,
     classes : [
         'Inicia tu camino como Frontend Developer',
         '¿Qué es HTML y CSS? ¿Para qué sirven?',
@@ -372,6 +523,7 @@ FrontDeveloper.name
 
 const PracticoFrontDeveloper = new coursesCreator ({
     name: 'Curso Practico de Frontend Developer',
+    lang: 'english',
     classes : [
         '¿Ya tomaste el Curso de Frontend Developer?',
         'Buenas prácticas de CSS: reflexión y advertencias',
@@ -486,7 +638,7 @@ const PythonDesdeCero = new learningPath({
     }
 })
 
-const MentaleroBobby = new AdvancedEmotion({
+const MentaleroBobby = new AdvancedEmotionWithPlatziFreeStudent({
     name: 'Mentalero Bobby',
     human: 'Riley',
     jobLocaton: 'Memoria a Largo Plazo',
@@ -504,7 +656,7 @@ const MentaleroBobby = new AdvancedEmotion({
     ]
 });
 
-const MentaleroPaula = new AdvancedEmotion({
+const MentaleroPaula = new AdvancedEmotionWithPlatziBasicStudent({
     name: 'Mentalero Paula',
     human: 'Riley',
     jobLocaton: 'Memoria a Largo Plazo',
@@ -515,6 +667,45 @@ const MentaleroPaula = new AdvancedEmotion({
         otras: undefined,
     }, friends: [
         'Mentalero Bobby',
+    ],
+    learningPaths: [
+        LibreriasDependenciasNPMJS,
+        PythonDesdeCero,
+    ]
+});
+
+const GuardiaDave = new AdvancedEmotionWithPlatziExpertStudent({
+    name: 'Guardian del Subconciente Dave',
+    human: 'Riley',
+    jobLocaton: 'Subconciente',
+    energyType: 'Masculina',
+    responsabilities: {
+        cuartel: '',
+        human: 'Proteger Mente',
+        otras: undefined,
+    }, friends: [
+        'Guardian del Subconciente Frank',
+    ],
+    learningPaths: [
+        LibreriasDependenciasNPMJS,
+        PythonDesdeCero,
+    ]
+});
+
+const EmocionAlegria = new AdvancedEmotionAsTeacher({
+    name: 'Alegria',
+    human: 'Riley',
+    jobLocaton: 'Cuartel General',
+    energyType: 'Femenina',
+    responsabilities: {
+        cuartel: 'Liderear Emociones',
+        human: 'Guiar a Riley',
+        otras: undefined,
+    }, friends: [
+        'Tristeza',
+        'Furia',
+        'Desagrado',
+        'Miedo',
     ],
     learningPaths: [
         LibreriasDependenciasNPMJS,
